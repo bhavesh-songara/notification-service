@@ -73,7 +73,6 @@ dev.env
 prod.env
 .env
 .env.test
-*.env
 data/
 
 # parcel-bundler cache (https://parceljs.org/)
