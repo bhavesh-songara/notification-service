@@ -1,21 +1,38 @@
 import IORedis from 'ioredis';
-
 import logger from '../utils/logger';
 
-export let redisClient: IORedis;
+let redisClient: IORedis;
 
-export async function connect() {
-  redisClient = new IORedis({
-    host: process.env.REDIS_HOST || 'localhost',
-    port: Number(process.env.REDIS_PORT || 6379),
-    password: process.env.REDIS_PASSWORD
-  });
+export const connectToRedis = async () => {
+  logger.info('Connecting to redis');
 
-  redisClient.on('error', (error: Error) => {
-    logger.error(`Error in connecting with Redis`, error);
-  });
+  if (!redisClient) {
+    redisClient = new IORedis({
+      host: process.env.REDIS_HOST,
+      port: Number(process.env.REDIS_PORT),
+      password: process.env.REDIS_PASSWORD || undefined
+    });
 
-  redisClient.on('connect', () => {
-    logger.info(`Connected with Redis`);
-  });
-}
+    redisClient.on('connect', () => {
+      logger.info('Connected to redis');
+    });
+
+    redisClient.on('error', (err) => {
+      redisClient.disconnect();
+    });
+  }
+
+  // Check if redis is connected
+  try {
+    await redisClient.ping();
+  } catch (err) {
+    redisClient.disconnect();
+    throw new Error('Error in connecting to redis');
+  }
+
+  return redisClient;
+};
+
+export const getRedisClient = () => {
+  return redisClient;
+};

@@ -9,12 +9,12 @@ import ErrorHandler from './middleware/errorHandler';
 
 const app = express();
 
-app.use(cors());
+app.use(cors({ origin: '*' }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // This will log all incoming requests
-app.use(getRequestLogger);
+app.use(getRequestLogger());
 
 app.use('/healthcheck', HealthCheckController.healthCheck);
 app.use('/api', apiRouter);
@@ -22,6 +22,6 @@ app.use('/api', apiRouter);
 // This will send a 404 error if any route is not found
 app.use('*', ErrorHandler.notFoundHandler);
 // This will handle all errors
-app.use(ErrorHandler.getErrorHandler);
+app.use(ErrorHandler.getErrorHandler());
 
 export default app;

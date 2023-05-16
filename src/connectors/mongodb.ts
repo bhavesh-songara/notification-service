@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 import logger from '../utils/logger';
 
-export const connect = async () => {
+const connectToMongodb = async () => {
   const dbName = process.env.MONGODB_DBNAME;
   const host = process.env.MONGODB_HOST;
   const username = process.env.MONGODB_USERNAME;
@@ -24,3 +24,5 @@ export const connect = async () => {
 
   logger.info(`Connected to MongoDB: ${host}`);
 };
+
+export default connectToMongodb;

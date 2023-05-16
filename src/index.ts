@@ -1,17 +1,25 @@
 import app from './app';
-import * as mongodb from './connectors/mongodb';
+import connectToMongodb from './connectors/mongodb';
+import { connectToRedis } from './connectors/redis';
 import logger from './utils/logger';
-import * as redis from './connectors/redis';
+import validateEnv from './utils/validateEnv';
+import { mailWorker } from './workers/mailWorker';
 
 async function bootstrap() {
   const SERVICE_PORT = process.env.SERVICE_PORT;
 
   try {
-    // await mongodb.connect();
-    // await redis.connect();
+    await connectToMongodb();
+
+    await connectToRedis();
+
+    validateEnv();
+
     app.listen(SERVICE_PORT, () => {
       logger.info(`HTTP server running on port: ${SERVICE_PORT}`);
     });
+
+    mailWorker.run();
   } catch (err) {
     logger.error('Error in starting server', err);
     process.exit(1);
